@@ -1,0 +1,7 @@
+[client]
+database = edeliver01
+host = localhost
+user = gravityns
+password = Ippacket!1990
+sql_mode = STRICT_TRANS_TABLES
+default-character-set = utf8
