@@ -1,8 +1,9 @@
-from django.http import HttpResponse
+from django.contrib.auth import login, get_user_model
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from .forms import ContactForm
+from .forms import ContactForm, UserCreationForm, UserLoginForm
 
-
+User = get_user_model()
 
 def display_meta(request):
 	values = request.META.items()
@@ -19,16 +20,19 @@ def display_meta(request):
 
 def home_page(request):
 
+	if request.user.is_authenticated:
+		print(request.user.username)
+
 	context = {
-		'title':'Home',
+		'title': request.user.username +' you are Home!',
 		'content':'Welcome to the contact page',
-		'form': contact_form
+		#'form': contact_form
 
 
 
 	}
 
-	return render(request, 'contact/view.html', context)
+	return render(request, 'home_page.html', context)
 
 def about_page(request):
 
@@ -61,3 +65,30 @@ def contact_page(request):
 
 
 	return render(request, 'contact/view.html', context)
+
+
+
+def register(request, *args, **kwargs):
+
+	form = UserCreationForm(request.POST or None)
+	if form.is_valid():
+		form.save()
+		return HttpResponseRedirect('/login')
+		#print('user created')
+
+	return render(request, 'accounts/register.html', {'form':form})
+
+
+def user_login(request, *args, **kwargs):
+
+	form = UserLoginForm(request.POST or None)
+	if form.is_valid():
+		username = form.cleaned_data.get('username')
+
+		user_obj = User.objects.get(username__iexact=username)
+		login(request, user_obj)
+		return HttpResponseRedirect('/')
+		#print('user created')
+
+	return render(request, 'accounts/login.html', {'form':form})
+
