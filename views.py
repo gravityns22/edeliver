@@ -1,7 +1,7 @@
 from django.contrib.auth import login, get_user_model
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-from .forms import ContactForm, UserCreationForm, UserLoginForm, UploadFileForm
+from .forms import ContactForm, UserCreationForm, UserLoginForm, UploadFileForm, DocumentForm
 import logging
 from django.contrib import messages
 from django.urls import reverse
@@ -99,6 +99,32 @@ def handle_uploaded_file(f):
     with open('test.csv', 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+
+
+from .models import Document
+
+def upload_file_v2(request):
+    if request.method == 'POST':
+        form = DocumentForm(request.POST, request.FILES)
+        if form.is_valid():
+            # file is saved
+            print('user:',request.user)
+            print('request.POST',request.POST)
+            new_doc = form.save(commit=False)
+            #new_doc =  Document(document=request.FILES['document'], user=request.user)
+            new_doc.user = request.user
+            new_doc.save()
+            #new_doc.save()
+
+            #form.save()
+            #data = {'is_valid': True, 'name': new_doc.document.name, 'url': new_doc.document.url}
+            return HttpResponseRedirect('/')
+    else:
+        form = DocumentForm()
+
+    new_doc =  Document(user=request.user)
+    return render(request, 'geocodeaddresses/upload.html', {'form': form})
+
 
 def upload_file(request):
 	if request.method == 'POST':

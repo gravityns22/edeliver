@@ -1,4 +1,10 @@
 # accounts.models.py
+import random
+import os
+
+from django.conf import settings
+
+
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.contrib.auth.models import (
@@ -235,3 +241,52 @@ class Product(models.Model):
 
     def __str__(self):
         return '{}:{}:{}:{}:{}'.format(self.id,self.name, self.price, self.stock_quantity,self.user)
+
+
+'''
+extract the file extension from the file name
+'''
+def get_file_extension(file_path):
+    base_name = os.path.basename(file_path)
+    name, ext = os.path.splitext(base_name)
+
+    return name, ext
+
+
+'''
+A method to return a random file name
+'''
+def upload_file_path(instance, filename):
+    print('Instance:', instance)
+    print('FileName:', filename)
+
+    new_filename = random.randint(1,7777777777)
+
+    name, ext = get_file_extension(filename)
+
+    final_filename = '{new_filename}{ext}'.format(new_filename=new_filename, ext=ext)
+    
+    return 'documents/uploads/{user_id}_{new_filename}/{final_filename}'.format(user_id=instance.user.id,
+        new_filename=new_filename, final_filename=final_filename)
+
+'''
+'''
+def user_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return 'user_{0}/{1}'.format(instance.user.id, filename)
+
+
+def validate_file_extension(value):
+        if not value.name.endswith('.csv'):
+            #raise forms.ValidationError("Only CSV files are accepted")
+
+            raise ValidationError(
+            _('%(value)s is not an acceptable file format. Only CSV files are accepted'),
+            params={'value': value},
+        )
+
+class Document(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='documents')
+    title = models.CharField(max_length=255, blank=True)
+    document = models.FileField(upload_to=upload_file_path)
+    uploaded_at = models.DateTimeField(auto_now_add=True)

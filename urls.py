@@ -19,11 +19,11 @@ from django.conf.urls.static import static
 
 from django.contrib import admin
 from django.urls import path, re_path, include
-from .views import display_meta, contact_page, register, user_login, home_page, upload_file, upload_csv
+from .views import display_meta, contact_page, register, user_login, home_page, upload_file_v2, upload_csv
 
 
 urlpatterns = [
-    re_path(r'^batch-geocode/$', upload_csv, name='batch-geocode'),
+    re_path(r'^batch-geocode/$', upload_file_v2, name='batch-geocode'),
     re_path(r'^$', home_page),
     re_path(r'^login/$', user_login),
     re_path(r'^register/$', register),

@@ -9,7 +9,7 @@ from .models import USERNAME_REGEX
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-
+from .models import Document
 
 #import our user
 from django.contrib.auth import get_user_model, authenticate
@@ -124,3 +124,18 @@ def validate_file_extension(value):
 class UploadFileForm(forms.Form):
  	title = forms.CharField(max_length=50)
  	file = forms.FileField(validators=[validate_file_extension])
+
+
+class DocumentForm(forms.ModelForm):
+    class Meta:
+        model = Document
+        fields = ('title', 'document', )
+        exclude = ['user']
+
+    def clean(self):
+    	data = self.cleaned_data
+    	print('DocumentForm--->clean:',data['document'])
+    	if not str(data['document']).endswith('.csv'):
+            #raise forms.ValidationError("Only CSV files are accepted")
+
+            raise ValidationError('Must be a CSV file')
