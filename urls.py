@@ -13,12 +13,17 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
+from django.conf import settings
+from django.conf.urls.static import static
+
 from django.contrib import admin
 from django.urls import path, re_path, include
-from .views import display_meta, contact_page, register, user_login, home_page
+from .views import display_meta, contact_page, register, user_login, home_page, upload_file, upload_csv
 
 
 urlpatterns = [
+    re_path(r'^batch-geocode/$', upload_csv, name='batch-geocode'),
     re_path(r'^$', home_page),
     re_path(r'^login/$', user_login),
     re_path(r'^register/$', register),
@@ -26,3 +31,7 @@ urlpatterns = [
 	path('meta/', display_meta),
     path('admin/', admin.site.urls),
 ]
+
+if settings.DEBUG:
+    urlpatterns + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

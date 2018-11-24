@@ -6,6 +6,9 @@ from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.validators import RegexValidator
 from .models import USERNAME_REGEX 
 
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
 
 
 #import our user
@@ -58,7 +61,7 @@ class ContactForm(forms.Form):
 	first_name = forms.CharField()
 	last_name = forms.CharField()
 	email = forms.EmailField()
-	message = forms.CharField()
+	message = forms.CharField(widget=forms.Textarea)
 
 
 class UserCreationForm(forms.ModelForm):
@@ -104,3 +107,20 @@ class UserChangeForm(forms.ModelForm):
         # This is done here, rather than on the field, because the
         # field does not have access to the initial value
         return self.initial["password"]
+
+
+'''
+This form is used by a user to upload a csv file containing addresses
+'''
+def validate_file_extension(value):
+        if not value.name.endswith('.csv'):
+            #raise forms.ValidationError("Only CSV files are accepted")
+
+            raise ValidationError(
+            _('%(value)s is not an acceptable file format. Only CSV files are accepted'),
+            params={'value': value},
+        )
+
+class UploadFileForm(forms.Form):
+ 	title = forms.CharField(max_length=50)
+ 	file = forms.FileField(validators=[validate_file_extension])

@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
-
+<div class="col-sm-6 col-12">
 {% block content %}
 <h1>Sign In</h1>
+
 {% include "accounts/form.html"  with form=form %}
+</div>
 
 {% endblock %}

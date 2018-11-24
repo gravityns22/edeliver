@@ -6,7 +6,7 @@ from django.contrib.auth.models import (
 )
 
 from django.core.validators import RegexValidator
-
+USERNAME_REGEX = '^[a-zA-Z0-9.@+-]*$'
 
 class UserManager(BaseUserManager):
     def create_user(self, username, email, date_of_birth, password=None):
@@ -48,7 +48,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-USERNAME_REGEX = '^[a-zA-Z0-9.@+-]*$'
+
 
 class User(AbstractBaseUser):
     username = models.CharField(max_length=255, validators=[
